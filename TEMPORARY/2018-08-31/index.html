@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>2018-08-31</title>
+
+  <!-- <link rel="stylesheet" href="css/leaflet.awesome-markers.css" /> -->
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" /> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/2.8.1/d3.v2.min.js" integrity="sha256-HU95Gc4ycxJJmm+LrtAsSwFS5MF/Zk3X5ccSw8+c1C8=" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+	   integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+	   crossorigin=""/>
+	 <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+	   integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+	   crossorigin=""></script>
+   <!-- <script src="js/leaflet.awesome-markers.js"></script>
+   <script src="js/stations.js"></script> -->
+	<style type="text/css">
+	html, body{
+		height:100%;
+		margin:0;
+	}
+	#header{
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		font-family: sans-serif;
+		font-size: 35px;
+		padding: 10px;
+		background: #444;
+		width: 612px;
+		color: #ffffff;
+		text-align: left;
+		padding-right: 40px;
+		border: 2px solid #ddd;
+	}
+	#timestamp{
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		font-family: sans-serif;
+		font-size: 35px;
+		padding: 10px;
+		background: #444;
+		width: 291px;
+		color: #ffffff;
+		text-align: right;
+		padding-right: 40px;
+		border: 2px solid #ddd;
+		z-index: 9999;
+	}
+
+	#footer{
+		position: absolute;
+		bottom: 10px;
+		left: 10px;
+		font-family: sans-serif;
+		font-size: 13px;
+		padding: 10px;
+		background: #444;
+		width: auto;
+		color: #ffffff;
+		text-align: left;
+		margin-right:10px;
+		border: 2px solid #ddd;
+	}
+
+	#key{
+		left: 10px;
+		font-family: sans-serif;
+		font-size: 18px;
+		padding: 10px;
+		background: #444;
+		color: #ffffff;
+		text-align: left;
+		border: 2px solid #ddd;
+		position: absolute;
+		top: 87px;
+		height: 100px;
+		width: 117px;
+	}
+
+	a,a:hover, a:visited{
+		color: #38F7FF;
+	}
+
+	p{
+		display: inline-block;
+		margin-top: 1px;
+		position: relative;
+		top: -2px;
+		margin-left: 8px;
+	}
+
+	circle
+	{
+		/* fill-opacity: 0.6; */
+		fill-opacity: 1.0;
+	}
+
+	</style>
+</head>
+<body>
+
+	<div id="map" style="width: 100%; height: 100%;position:relative"></div>
+	<div id = "timestamp"></div>
+	<div id = "header">Bus bunching</div>
+	<div id = "key">
+		<!-- <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style= "width:16px; height:16px">
+			<circle cx="8" cy="8" r="8" fill="red"/>
+		</svg><p>Over $200</p>
+		<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style= "width:16px; height:16px">
+			<circle cx="8" cy="8" r="8" fill="yellow"/>
+		</svg><p>$50-$199</p>
+		<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style= "width:16px; height:16px">
+			<circle cx="8" cy="8" r="8" fill="green"/>
+		</svg><p>Under $50</p> -->
+	</div>
+	<div id = "footer">Original dataviz by <a href = "https://twitter.com/chris_whong">@chris_whong</a></div>
+	<script type="text/javascript">
+	//Attribution: http://bl.ocks.org/ZJONSSON/3087431
+	//Made at #code4philly transit hackathon
+
+	var darkMatter = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.{ext}', {
+	    attribution: 'Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL.',
+	    subdomains: 'abcd',
+	    minZoom: 0,
+	    maxZoom: 20,
+	    ext: 'png'
+	});
+
+
+	var map = new L.Map('map', {
+		center: new L.LatLng(37.53696, -77.42944),
+		zoom: 12,
+		layers: [darkMatter]
+	});
+
+  // function onBusClick(e) {
+  //   var props = e.target.feature.properties;
+  //   var text = '<em>' + props.Name + '</em>';
+  //
+  //   popup
+  //     .setLatLng(e.latlng)
+  //     .setContent(text)
+  //     .openOn(map);
+  //   map.setView(e.target.getLatLng());
+  // }
+  //
+  // function onEachBus(feature, layer) {
+  // 	layer.on({
+  // 		click: onBusClick,
+  // 	});
+  // }
+  //
+  // // Creates a dark purple marker with the bus icon
+  // var busMarker = L.AwesomeMarkers.icon({
+  //   prefix: 'fa',
+  //   icon: 'bus',
+  //   markerColor: 'darkpurple',
+  // });
+  //
+  // L.geoJSON(grtcPulseStations, {
+  //   pointToLayer: (feature, latlng) => {
+  //     return L.marker(latlng, {
+  //       icon: busMarker,
+  //       // pane: 'busPane',
+  //     });
+  //   },
+  //   onEachFeature: onEachBus,
+  // }).addTo(map);
+
+
+	/* Initialize the SVG layer */
+	// map._initPathRoot()
+	L.svg().addTo(map);
+
+	/* We simply pick up the SVG from the map object */
+	var svg = d3.select("#map").select("svg"),
+	g = svg.append("g");
+
+
+
+	d3.csv("brt20180831.csv", function(collection) {
+		/* Add a LatLng object to each item in the dataset */
+		collection.forEach(function(d) {
+			d.LatLng = new L.LatLng(d.lat,d.lon)
+		})
+
+		var time = 1535760000;
+		var previousTime;
+
+		var filtered = collection.filter(function(d){
+			return (d.x_epoch < 1535766858);
+		});
+
+
+		function update() {
+
+			previousTime = time;
+			time = time + 10;
+
+			showDateTime(time);
+
+			console.log(time);
+			grab = collection.filter(function(d){
+				return (d.x_epoch < time)&&(d.x_epoch > previousTime);
+			});
+		 	//filtered = filtered.concat(grab);
+		 	filtered = grab;
+		 	console.log(filtered);
+		 	var feature = g.selectAll("circle")
+		 	.data(filtered,function(d){
+		 		return d.Key;
+		 	});
+		 	feature.enter().append("circle").attr("fill",function(d){
+				console.log(d.rt);
+		// 		// if(d.pd=='North Bound') return '#1b9e77';
+		// 		// if(d.pd=='South Bound') return '#d95f02';
+        // if(d.rt=='1A') return '#1b9e77';
+        // if(d.rt=='1B') return '#d95f02';
+        // if(d.rt=='1C') return '#7570b3';
+		// 		// if(d.id==912) return '#e41a1c';
+		// 		// if(d.id==402) return '#377eb8';
+		// 		// if(d.id==2210) return '#4daf4a';
+		// 		// if(d.id==250) return '#984ea3';
+		// 		// if(d.id==257) return '#ff7f00';
+		// 		// if(d.id==260) return '#ffff33';
+		// 		// if(d.id==266) return '#a65628';
+		// 		// if(d.id==206) return '#f781bf';
+		// 		// if(d.id==506) return '#999999';
+        // // if(d.id==2106) return 'white';
+				if(d.id==2001) return '#a6cee3';
+				if(d.id==2002) return '#1f78b4';
+				if(d.id==2003) return '#b2df8a';
+				if(d.id==2004) return '#33a02c';
+				if(d.id==2005) return '#fb9a99';
+				if(d.id==2006) return '#e31a1c';
+				if(d.id==2007) return '#fdbf6f';
+				if(d.id==2008) return '#ff7f00';
+				if(d.id==2009) return '#cab2d6';
+				if(d.id==2010) return '#6a3d9a';
+			}).attr("r",function(d){
+		 		return map.getZoom();
+		 	});
+
+			// }).attr("r",0).transition().duration(100).attr("r",function(d){
+		 	// 	return map.getZoom();
+		 	// });
+
+		 	// feature.exit().transition().duration(250).attr("r",0).remove();
+			feature.exit().attr("r",0).remove();
+
+		 	feature.attr("cx",function(d) { return map.latLngToLayerPoint(d.LatLng).x});
+		 	feature.attr("cy",function(d) { return map.latLngToLayerPoint(d.LatLng).y});
+
+
+		 	setTimeout(update,100);
+
+		 }
+
+		 function showDateTime(unixtime){
+		 	var newDate = new Date();
+		 	newDate.setTime(unixtime*1000);
+		 	dateString = newDate.toString();
+		 	dateString = dateString.slice(0,21);
+		 	document.getElementById("timestamp").innerHTML = dateString;
+		 }
+
+
+		 update();
+		})
+</script>
+</body>
+</html>
