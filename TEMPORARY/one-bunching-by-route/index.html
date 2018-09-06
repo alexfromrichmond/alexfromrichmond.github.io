@@ -221,7 +221,7 @@
 				if(d.rt=='1C' && d.pd=='South Bound') return '#fb9a99';
 				if(d.rt=='1C' && d.pd=='North Bound') return '#e31a1c';
 			}).attr("r",function(d){
-		 		return map.getZoom();
+		 		return map.getZoom() * 1.5;
 		 	});
 
 			// }).attr("r",0).transition().duration(100).attr("r",function(d){
