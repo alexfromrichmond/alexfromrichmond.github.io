@@ -240,7 +240,7 @@
 				if(d.id==2009) return '#cab2d6';
 				if(d.id==2010) return '#6a3d9a';
 			}).attr("r",function(d){
-		 		return map.getZoom();
+		 		return map.getZoom() * 1.5;
 		 	});
 
 			// }).attr("r",0).transition().duration(100).attr("r",function(d){
