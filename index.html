@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/1.10.1/mapbox-gl.js" integrity="sha256-aoBWTMm3fPRHIjCqHbqAeXrqJP1CAMv+8PCtTTYRvDw=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/1.10.1/mapbox-gl.css" integrity="sha256-+A0NJBMh5IIbhodBU6EO4tNTW4dNHmW7LgzCwGGsD1I=" crossorigin="anonymous" />
+    <style>
+body { margin: 0; padding: 0; }
+#map { width: 100%; height: 100vh; }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+mapboxgl.accessToken = 'pk.eyJ1Ijoic2hpbWl6dSIsImEiOiJjam95MDBhamYxMjA1M2tyemk2aHMwenp5In0.i2kMIJulhyPLwp3jiLlpsA';
+
+var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: 'mapbox://styles/mapbox/light-v10',
+    center: [-77.476009, 37.531399],
+    zoom: 12,
+    minZoom: 10,
+    maxZoom: 18
+});
+
+const url = 'richmondparcels.geojson';
+
+map.on('load', function() {
+  map.addSource("richmondparcels", {
+    type: "geojson",
+    data: url
+  });
+
+  map.addLayer({
+    "id": "geojsonLayer",
+    "type": "fill",
+    "source": "richmondparcels",
+    "layout": {},
+    "paint": {
+      "fill-color": "#000000",
+      "fill-opacity": 0.5
+    }
+  });
+});
+    </script>        
+  </body>
+</html>
