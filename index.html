@@ -1,45 +1,169 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="rzd.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/1.10.1/mapbox-gl.js" integrity="sha256-aoBWTMm3fPRHIjCqHbqAeXrqJP1CAMv+8PCtTTYRvDw=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/1.10.1/mapbox-gl.css" integrity="sha256-+A0NJBMh5IIbhodBU6EO4tNTW4dNHmW7LgzCwGGsD1I=" crossorigin="anonymous" />
     <style>
 body { margin: 0; padding: 0; }
-#map { width: 100%; height: 100vh; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+
+#map canvas {
+cursor: crosshair;
+}
+
+#features {
+position: absolute;
+top: 0;
+right: 0;
+bottom: 0;
+width: 33.3%;
+overflow: auto;
+background: rgba(255, 255, 255, 0.8);
+}
+
     </style>
   </head>
   <body>
     <div id="map"></div>
+    <pre id="features"></pre>
     <script>
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2hpbWl6dSIsImEiOiJjam95MDBhamYxMjA1M2tyemk2aHMwenp5In0.i2kMIJulhyPLwp3jiLlpsA';
 
 var map = new mapboxgl.Map({
-    container: 'map', // container id
+    container: 'map',
     style: 'mapbox://styles/mapbox/light-v10',
-    center: [-77.476009, 37.531399],
-    zoom: 12,
+    // center: [-77.476009, 37.531399],
+    center: [-77.433594, 37.538758],
+    zoom: 11,
     minZoom: 10,
-    maxZoom: 18
+    maxZoom: 19
 });
 
-const url = 'richmondparcels.geojson';
+const url = 'https://axwn.github.io/test.geojson';
+
+// get color depending on population density value
+function getColor(d) {
+  return d >= 20 ? '#2c7bb6' :
+      d >= 5  ? '#fdae61' :
+      d > 0  ? '#d7191c' :
+            'black';
+}
+
+const mystops = [];
+for (const d in zoning_districts) {
+  mystops.push([d, getColor(zoning_districts[d].max_density)]);
+}
 
 map.on('load', function() {
-  map.addSource("richmondparcels", {
+  map.addSource("geojson", {
     type: "geojson",
+    buffer: 0,
     data: url
   });
 
   map.addLayer({
     "id": "geojsonLayer",
     "type": "fill",
-    "source": "richmondparcels",
+    "source": "geojson",
     "layout": {},
     "paint": {
-      "fill-color": "#000000",
-      "fill-opacity": 0.5
+      // "fill-antialias": false,
+      // 'fill-outline-color': 'rgba(0,0,0,0)',
+      "fill-color": {
+        property: 'Name',
+        type: 'categorical',
+        stops: mystops
+      },
+      // stops: [
+      //     // No units allowed
+      //     ['CM', 'black'],
+      //     ['DCC', 'black'],
+      //     ['M-1', 'black'],
+      //     ['M-2', 'black'],
+      //     ['RP', 'black'],
+      //     ['OS', 'black'],
+      //     // < 5 units
+      //     ['I', '#d7191c'],
+      //     ['R-1', '#d7191c'], 
+      //     ['R-2', '#d7191c'], 
+      //     ['R-3', '#d7191c'], 
+      //     ['R-4', '#d7191c'],
+      //     ['R-5', '#d7191c'],
+      //     ['R-6', '#d7191c'],
+      //     ['R-7', '#d7191c'],
+      //     ['R-8', '#d7191c'],
+      //     ['R-MH', '#d7191c'],
+      //     // 5+ units
+      //     ['R-43', '#fdae61'],
+      //     ['R-48', '#fdae61'],
+      //     ['R-53', '#fdae61'],
+      //     ['R-63', '#fdae61'],
+      //     ['R-73', '#fdae61'],
+      //     ['RO-1', '#fdae61'],
+      //     ['RO-2', '#fdae61'],
+      //     ['RO2-PE2', '#fdae61'],
+      //     ['RO2-PE4', '#fdae61'],
+      //     ['RO2-PE5', '#fdae61'],
+      //     ['B-1', '#fdae61'],
+      //     ['UB', '#fdae61'],
+      //     ['UB-PE2', '#fdae61'],
+      //     ['UB-PE3', '#fdae61'],
+      //     ['UB-PE4', '#fdae61'],
+      //     ['UB-PE5', '#fdae61'],
+      //     ['UB-PE6', '#fdae61'],
+      //     ['UB-PE7', '#fdae61'],
+      //     ['UB-PE8', '#fdae61'],
+      //     ['UB-PO1', '#fdae61'],
+      //     ['UB-PO2', '#fdae61'],
+      //     ['UB-PO3', '#fdae61'],
+      //     ['UB-PO4', '#fdae61'],
+      //     // 20+ units
+      //     ['UB-2', '#2c7bb6'],
+      //     ['UB2-PE8', '#2c7bb6'],
+      //     ['RO-3', '#2c7bb6'],
+      //     ['HO', '#2c7bb6'],
+      //     ['B-2', '#2c7bb6'],
+      //     ['B2-POD', '#2c7bb6'],
+      //     ['B-3', '#2c7bb6'],
+      //     ['B-4', '#2c7bb6'],
+      //     ['B-5', '#2c7bb6'],
+      //     ['B-6', '#2c7bb6'],
+      //     ['B-7', '#2c7bb6'],
+      //     ['RF-1', '#2c7bb6'],
+      //     ['RF-2', '#2c7bb6'],
+      //     ['TOD-1', '#2c7bb6'],
+      //   ]
+      // },
+      "fill-opacity": 0.7
     }
   });
+});
+
+map.on('mousemove', function(e) {
+var features = map.queryRenderedFeatures(e.point);
+ 
+// Limit the number of properties we're displaying for
+// legibility and performance
+var displayProperties = [
+'properties',
+];
+ 
+var displayFeatures = features.map(function(feat) {
+var displayFeat = {};
+displayProperties.forEach(function(prop) {
+displayFeat[prop] = feat[prop];
+});
+return displayFeat;
+});
+ 
+document.getElementById('features').innerHTML = JSON.stringify(
+displayFeatures,
+null,
+2
+);
 });
     </script>        
   </body>
