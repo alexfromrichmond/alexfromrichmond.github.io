@@ -1,20 +1,78 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <script src="rzd.js"></script>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>donotshare</title>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/1.10.1/mapbox-gl.js" integrity="sha256-aoBWTMm3fPRHIjCqHbqAeXrqJP1CAMv+8PCtTTYRvDw=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/1.10.1/mapbox-gl.css" integrity="sha256-+A0NJBMh5IIbhodBU6EO4tNTW4dNHmW7LgzCwGGsD1I=" crossorigin="anonymous" />
+
+    <script src="rzd.js"></script>
+
     <style>
 body { margin: 0; padding: 0; }
-#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+#map {
+    height: 600px;
+    margin-bottom: 10px;
+}
+
+#map img {
+ max-width: none;
+ min-width: 0px;
+ height: auto;
+
+}
+
+#legend-container {
+  position: relative;
+  bottom: 0;
+  /* height: 100%; */
+  /* margin-bottom: 40px; */
+}
+
+#legend {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  /* margin-top: 10px; */
+  margin-left: 20px;
+
+
+  background: rgba(255, 255, 255, 0.8);
+
+  overflow: auto;
+  border-radius: 3px;
+
+  padding: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  line-height: 18px;
+  height: 100px;
+  margin-bottom: 60px;
+  width: 200px;
+}
+
+/* #legend > div {
+  min-width: 50%;
+  margin-left: 25%;
+} */
+
+/* #map { position: absolute; top: 0; bottom: 0; width: 100%; }
 
 
 #map canvas {
 cursor: crosshair;
-}
+} */
 
-#features {
+/* #features {
 position: absolute;
 top: 0;
 right: 0;
@@ -22,9 +80,9 @@ height: 33.3%;
 width: 33.3%;
 overflow: auto;
 background: rgba(255, 255, 255, 0.8);
-}
+} */
 
-.map-overlay {
+/* .map-overlay {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -33,16 +91,8 @@ background: rgba(255, 255, 255, 0.8);
   font-family: Arial, sans-serif;
   overflow: auto;
   border-radius: 3px;
-}
+} */
 
-#legend {
-  padding: 10px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  line-height: 18px;
-  height: 90px;
-  margin-bottom: 40px;
-  width: 200px;
-}
 
 .legend-key {
   display: inline-block;
@@ -53,114 +103,72 @@ background: rgba(255, 255, 255, 0.8);
 }
     </style>
   </head>
-  <body>
+  <!-- <body>
     <div id="map"></div>
     <pre id="features"></pre>
-    <div class='map-overlay' id='legend'></div>
     <script>
-mapboxgl.accessToken = 'pk.eyJ1Ijoic2hpbWl6dSIsImEiOiJjam95MDBhamYxMjA1M2tyemk2aHMwenp5In0.i2kMIJulhyPLwp3jiLlpsA';
 
-var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/light-v10',
-    center: [-77.433594, 37.538758],
-    zoom: 11,
-    minZoom: 10,
-    maxZoom: 19
-});
-
-map.fitBounds([
-    [-77.38530301,37.44656788],
-    [-77.60117281,37.60244496]
-  ], {
-    padding: 50
-  });
-
-const url = 'test.geojson';
-
-// get color depending on population density value
-function getColor(d) {
-  return d >= 100 ? '#2c7bb6' :
-    '#fdae61';
-}
-
-const mystops = [];
-for (const d in zoning_districts) {
-  if (zoning_districts[d].housing_allowed) {
-    if (zoning_districts[d].multi_family_allowed) {
-      mystops.push([d, getColor(zoning_districts[d].max_units_per_acre)]);
-    } else {
-      mystops.push([d, "#d7191c"]);
-    }
-  } else {
-    mystops.push([d, "black"]);
-  }
-}
-
-map.on('load', function() {
-  map.addSource("geojson", {
-    type: "geojson",
-    buffer: 0,
-    data: url
-  });
-
-  map.addLayer({
-    "id": "geojsonLayer",
-    "type": "fill",
-    "source": "geojson",
-    "layout": {},
-    "paint": {
-      "fill-color": {
-        property: 'Name',
-        type: 'categorical',
-        stops: mystops
-      },
-      "fill-opacity": 0.7
-    }
-  });
-});
-
-var layers = ['No housing allowed', 'Apartments not allowed', 'A few apartments allowed', 'Many apartments allowed'];
-var colors = ['black', '#d7191c', '#fdae61', '#2c7bb6'];
-
-for (i = 0; i < layers.length; i++) {
-  var layer = layers[i];
-  var color = colors[i];
-  var item = document.createElement('div');
-  var key = document.createElement('span');
-  key.className = 'legend-key';
-  key.style.backgroundColor = color;
-
-  var value = document.createElement('span');
-  value.innerHTML = layer;
-  item.appendChild(key);
-  item.appendChild(value);
-  legend.appendChild(item);
-}
-
-map.on('mousemove', function(e) {
-var features = map.queryRenderedFeatures(e.point);
- 
-// Limit the number of properties we're displaying for
-// legibility and performance
-var displayProperties = [
-'properties',
-];
- 
-var displayFeatures = features.map(function(feat) {
-var displayFeat = {};
-displayProperties.forEach(function(prop) {
-displayFeat[prop] = feat[prop];
-});
-return displayFeat;
-});
- 
-document.getElementById('features').innerHTML = JSON.stringify(
-displayFeatures,
-null,
-2
-);
-});
     </script>        
-  </body>
+  </body> -->
+  <body>
+      <!-- Container -->
+      <div class="container">
+  
+        <!-- Masthead -->
+        <div class="masthead">
+  
+          <!-- Navigation -->
+          <nav>
+          </nav>
+        </div>
+  
+        <!-- Jumbotron -->
+        <div class="jumbotron">
+          <h1>Simple HTML Page</h1>
+          <p class="lead">Working with Bootstrap and Mapbox GL</p>
+        </div>
+  
+        <!-- Main Content-->
+        <div class="masthead">
+          <h3 class="text-muted">Map</h3>
+          <div class="row">
+            <div class="col-md-12">
+              <div id="map"></div>
+              <div id="legend-container">
+                <div id="legend"></div>
+              </div>    
+  
+            <!-- START YOUR BOOTSTRAP GOODNESS HERE -->
+  
+              <!-- <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h3 class="panel-title">Panel title</h3>
+                </div>
+                <div class="panel-body">
+                  <ul class="list-group">
+                    <li class="list-group-item">Cras justo odio</li>
+                    <li class="list-group-item">Dapibus ac facilisis in</li>
+                    <li class="list-group-item">Morbi leo risus</li>
+                    <li class="list-group-item">Porta ac consectetur ac</li>
+                    <li class="list-group-item">Vestibulum at eros</li>
+                  </ul>
+                </div>
+            </div> -->
+  
+            <!-- END YOUR BOOTSTRAP GOODNESS HERE -->
+  
+            </div> <!-- col -->
+          </div> <!-- row -->
+        </div>
+  
+        <!-- Site footer -->
+        <footer class="footer">
+          <p>&copy; <span id="currentYear">THIS YEAR</span></p>
+        </footer>
+  
+      </div> <!-- /container -->
+      
+    <!-- local code to load and style the map -->
+    <script src="map.js"></script>
+    </body>
 </html>
