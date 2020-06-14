@@ -16,7 +16,7 @@ function init() {
     [-77.38530301,37.44656788],
     [-77.60117281,37.60244496]
   ], {
-    padding: 50
+    padding: 20
   });
   
   // const url = 'https://axwn.github.io/donotshare/test.geojson';
